@@ -27,9 +27,23 @@ find_package(tf2_ros REQUIRED)
 set(OpenCV_STATIC ON)
 find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
-find_package(GTSAM REQUIRED)
-find_package(Eigen REQUIRED)
+# find_package(GTSAM REQUIRED)  # Building GTSAM from source instead
+# find_package(Eigen REQUIRED)  # tf2_eigen already finds Eigen, so use system Eigen
 find_package(OpenMP REQUIRED)
+
+# Configure GTSAM options before adding subdirectory
+# Use system Eigen (already found by tf2_eigen) to prevent Eigen3::Eigen target conflict
+set(GTSAM_USE_SYSTEM_EIGEN ON CACHE BOOL "Use system Eigen instead of bundled" FORCE)
+# Disable TBB to prevent target conflict (TBB may already be found by PCL or other dependencies)
+set(GTSAM_WITH_TBB OFF CACHE BOOL "Enable TBB support" FORCE)
+# Disable wrap library (Python/Matlab bindings) - not needed for LIO-SAM
+set(GTSAM_BUILD_WRAP OFF CACHE BOOL "Build wrap utility for Python/Matlab" FORCE)
+# Enable unstable components (needed for IncrementalFixedLagSmoother used in imuPreintegration)
+set(GTSAM_BUILD_UNSTABLE ON CACHE BOOL "Build unstable components" FORCE)
+
+# Add GTSAM as subdirectory - it will use the system Eigen found by tf2_eigen
+add_subdirectory(third_party/gtsam)
+
 
 include_directories(
   include/lio_sam
@@ -49,11 +63,11 @@ ament_target_dependencies(${PROJECT_NAME}_imageProjection rclcpp rclpy std_msgs 
 target_link_libraries(${PROJECT_NAME}_imageProjection "${cpp_typesupport_target}") 
 
 add_executable(${PROJECT_NAME}_imuPreintegration src/imuPreintegration.cpp)
-ament_target_dependencies(${PROJECT_NAME}_imuPreintegration rclcpp rclpy std_msgs sensor_msgs geometry_msgs nav_msgs pcl_conversions pcl_msgs visualization_msgs tf2 tf2_ros tf2_eigen tf2_sensor_msgs tf2_geometry_msgs OpenCV PCL GTSAM Eigen)
-target_link_libraries(${PROJECT_NAME}_imuPreintegration gtsam "${cpp_typesupport_target}")
+ament_target_dependencies(${PROJECT_NAME}_imuPreintegration rclcpp rclpy std_msgs sensor_msgs geometry_msgs nav_msgs pcl_conversions pcl_msgs visualization_msgs tf2 tf2_ros tf2_eigen tf2_sensor_msgs tf2_geometry_msgs OpenCV PCL)
+target_link_libraries(${PROJECT_NAME}_imuPreintegration gtsam gtsam_unstable "${cpp_typesupport_target}")
 
 add_executable(${PROJECT_NAME}_mapOptimization src/mapOptmization.cpp)
-ament_target_dependencies(${PROJECT_NAME}_mapOptimization rclcpp rclpy std_msgs sensor_msgs geometry_msgs nav_msgs pcl_conversions pcl_msgs visualization_msgs tf2 tf2_ros tf2_eigen tf2_sensor_msgs tf2_geometry_msgs OpenCV PCL GTSAM)
+ament_target_dependencies(${PROJECT_NAME}_mapOptimization rclcpp rclpy std_msgs sensor_msgs geometry_msgs nav_msgs pcl_conversions pcl_msgs visualization_msgs tf2 tf2_ros tf2_eigen tf2_sensor_msgs tf2_geometry_msgs OpenCV PCL)
 if (OpenMP_CXX_FOUND)
   target_link_libraries(${PROJECT_NAME}_mapOptimization gtsam "${cpp_typesupport_target}" OpenMP::OpenMP_CXX)
 else()
