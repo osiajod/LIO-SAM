@@ -3,7 +3,7 @@
 # Check if both paths are provided
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Usage: $0 <code_base_path> <ros_bags_path>"
-    echo "Example: $0 /home/bgarage/dev/LIO-SAM_ws/src/LIO-SAM /home/bgarage/ros_bags"
+    echo "Example: $0 /home/bgarage/dev/LIOde-SAM_ws/src/LIO-SAM /home/bgarage/Downloads/ros_bags"
     exit 1
 fi
 
@@ -37,5 +37,14 @@ docker run --init -it -d \
   -e DISPLAY=$DISPLAY \
   -v "$CODE_BASE_PATH:/root/catkin_ws/src/LIO-SAM" \
   -v "$ROS_BAGS_PATH:/root/ros_bags" \
-  liosam-kinetic-xenial \
+  liosam-kinetic-xenial2 \
   bash
+
+# At ~/catkin_ws run:
+  # catikin_make
+  # . devel/setup.bash
+## In terminal 1
+  # roslaunch lio_sam run.launch
+## In terminal 2 
+  # rosbag play /root/ros_bags/park_dataset.bag -r 3
+
