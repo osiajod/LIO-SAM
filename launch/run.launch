@@ -14,7 +14,7 @@
     <!--- Run Navsat -->
     <include file="$(find lio_sam)/launch/include/module_navsat.launch" />
 
-    <!--- Run Rviz-->
-    <include file="$(find lio_sam)/launch/include/module_rviz.launch" />
+    <!--- Run Rviz (commented out - run rviz on host instead) -->
+    <!-- <include file="$(find lio_sam)/launch/include/module_rviz.launch" /> -->
 
 </launch>
