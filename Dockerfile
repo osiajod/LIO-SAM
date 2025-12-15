@@ -18,12 +18,7 @@ RUN apt-get update \
 
 SHELL ["/bin/bash", "-c"]
 
-RUN mkdir -p ~/catkin_ws/src \
-    && cd ~/catkin_ws/src \
-    && git clone https://github.com/TixiaoShan/LIO-SAM.git \
-    && cd .. \
-    && source /opt/ros/kinetic/setup.bash \
-    && catkin_make
+RUN mkdir -p ~/catkin_ws/src
 
 RUN echo "source /opt/ros/kinetic/setup.bash" >> /root/.bashrc \
     && echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc
